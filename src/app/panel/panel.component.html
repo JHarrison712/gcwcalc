@@ -1,0 +1,88 @@
+<div class="factionPicker">
+  <button mat-button (click)="setFaction(0)" *ngIf="faction===1">Switch to Imperial</button>
+  <button mat-button (click)="setFaction(1)" *ngIf="faction===0">Switch to Rebel</button>
+</div>
+<div class="help">
+  <a [routerLink]="['how-it-works']">How it's calculated</a>
+</div>
+<div class="flex">
+  <div class="panel calc" 
+  *ngIf="!prediction" 
+    [ngClass]="{'impLogo':faction===0, 'rebLogo':faction===1}">
+    <h2>GCW Progress Calculator</h2>
+    <form [formGroup]="myForm" (ngSubmit)="onSubmit(myForm)">
+      <div>
+        <mat-form-field class="inputWidth">
+          <mat-select formControlName="rank" placeholder="Current Rank">
+            <mat-option *ngFor="let rank of ranks" [value]="rank">
+              <span>{{getRankName(rank)}}</span>
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+      </div>
+
+      <div>
+        <mat-form-field class="inputWidth">
+          <input matInput formControlName="percent" type="number" #percent  placeholder="Current progress to next rank">
+              <mat-progress-bar
+          class="inputWidth" style="margin:auto"
+          [color]="'primary'"
+          [mode]="'determinate'"
+          [value]="percent.value">          
+      </mat-progress-bar></mat-form-field>
+  
+      </div>
+
+      <div>
+        <mat-form-field class="inputWidth">
+          <input matInput formControlName="points" type="number" placeholder="GCW Points">
+        </mat-form-field>
+      </div>
+
+      <button mat-raised-button color="primary" type="submit">Calculate</button>
+
+    </form>
+  </div>
+
+  <div class="panel calc" *ngIf="prediction">
+
+    <h2>After the update, you will be...</h2>
+    <div>
+      <h2>
+        <span [ngClass]="{'imperial':faction===0,'rebel':faction===1}">
+          {{getRankName(prediction.nextRank)}}
+        </span>
+        </h2>
+    </div>
+    <div>
+      <h2>{{prediction.nextPercent}}% to next rank</h2>
+      <mat-progress-bar
+          class="example-margin"
+          [color]="'primary'"
+          [mode]="'determinate'"
+          [value]="prediction.nextPercent">          
+      </mat-progress-bar>
+    </div>
+    <button mat-raised-button color="warn" type="submit" (click)="prediction=null">Reset</button>
+  </div>
+</div>
+
+<div class="panel" [style.width]="'500px'">
+  <h2>GCW Points needed to prevent decay</h2>
+  <table mat-table [dataSource]="decay" class="mat-elevation-z8">
+
+    <ng-container matColumnDef="title">
+      <th mat-header-cell *matHeaderCellDef> Rank </th>
+      <td mat-cell *matCellDef="let element"> {{getRankName(element)}} </td>
+    </ng-container>
+
+    <ng-container matColumnDef="value">
+      <th mat-header-cell *matHeaderCellDef> GCW Points Needed </th>
+      <td mat-cell *matCellDef="let element"> {{element.value}} </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="decayCols"></tr>
+    <tr mat-row *matRowDef="let row; columns: decayCols;"></tr>
+  </table>
+</div>

@@ -1,0 +1,58 @@
+<div class="help">
+  <a [routerLink]="['']">Back to calculator</a>
+</div>
+<div class="flex ">
+  <div class="panel">
+    <h2>How GCW Rank is calculated</h2>
+
+    <p>
+      First of all, each player has a hidden value called 'GCW Rating'. This rating value determines your current rank as well
+      as the percent progress that you see in-game.
+    </p>
+
+    <p>There is a table that creates twelve ranks with each rank covering 5000 rating points, as well as rating decay and maximum gains per week.</p>
+
+    <table mat-table [dataSource]="ranks" class="mat-elevation-z8">
+      <ng-container matColumnDef="rank">
+        <th mat-header-cell *matHeaderCellDef> Rank </th>
+        <td mat-cell *matCellDef="let r"> {{r.Rank}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="minRating">
+        <th mat-header-cell *matHeaderCellDef> MinRating </th>
+        <td mat-cell *matCellDef="let r"> {{r.MinRating}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="maxRating">
+        <th mat-header-cell *matHeaderCellDef> MaxRating </th>
+        <td mat-cell *matCellDef="let r"> {{r.MaxRating}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="imperialTitle">
+        <th mat-header-cell *matHeaderCellDef> ImperialTitle </th>
+        <td mat-cell *matCellDef="let r"> {{r.ImperialTitle}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="ratingEarningCap">
+        <th mat-header-cell *matHeaderCellDef> RatingEarningCap </th>
+        <td mat-cell *matCellDef="let r"> {{r.RatingEarningCap}} </td>
+      </ng-container>
+      <ng-container matColumnDef="maxRatingDecay">
+        <th mat-header-cell *matHeaderCellDef> MaxRatingDecay </th>
+        <td mat-cell *matCellDef="let r"> {{r.MaxRatingDecay}} </td>
+      </ng-container>
+
+
+      <tr mat-header-row *matHeaderRowDef="cols"></tr>
+      <tr mat-row *matRowDef="let row; columns: cols;"></tr>
+    </table>
+
+    <h3>The Equations</h3>
+    <p><code>CurrentRating = MinRating + (Rank_Progress / 100) * (MaxRating - MinRating)</code></p>
+    <p>You also need your "Rating Change". This is based on the GCW Points you accumulated this week</p>
+    <p><code>RatingChange = Ceiling( (RatingEarningCap * GCW_Points ) / (RatingEarningCap + GCW_Points)) - MaxRatingDecay</code></p>
+    <p><code>NextRating = CurrentRating + RatingChange</code>  *There are some edge cases here. For instance you cannot exceed 59999 rating, and if you decay below Lieutenant it will only decay to 29999 rating</p>
+    <p>With your new rating value, find the Rank band that you fit in.</p>
+    <p>To get your new progress percent: <code>round( (NextRating-NextRankMinRating) / (NextRankMaxRating - NextRankMaxRating)  * 100 )</code></p>
+  </div>
+</div>

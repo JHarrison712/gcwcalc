@@ -1,0 +1,35 @@
+.panel {
+  position: relative;
+  /* color:white; */
+  width: 500px;
+  /* margin: auto; */
+  /* background: rgba(7,12,50,.9); */
+  /* border: darkblue 0.5em solid; */
+  /* border-radius: 1em; */
+  padding: 1em;
+  margin: auto;
+  
+}
+.calc{
+  height:350px;
+  text-align: center;
+}
+
+.calc button{
+  position: absolute;
+  bottom: 1em;
+  left: 0; 
+  right: 0; 
+  margin-left: auto; 
+  margin-right: auto; 
+  width:150px;
+}
+
+.inputWidth {
+  width: 250px;
+  margin:auto;
+}
+
+
+
+
