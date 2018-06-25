@@ -46,7 +46,7 @@ export class PanelComponent implements OnInit {
 
   myForm: FormGroup;
   matcher = new MyErrorStateMatcher();
-  
+
   faction=0;
 
   prediction :Prediction|null = null;
@@ -56,8 +56,8 @@ export class PanelComponent implements OnInit {
   ngOnInit() {
     this.myForm = this.fb.group({
       rank: [null,Validators.required],
-      percent: [null, Validators.required],
-      points: [null, Validators.required]
+      percent: [null, [Validators.required, Validators.min(0), Validators.max(99.99)]],
+      points: [null, [Validators.required, , Validators.min(0), Validators.max(10000000)]]
     });
 
     this.decay = DecayEstimates.values.map(e =>{
@@ -103,7 +103,7 @@ export class PanelComponent implements OnInit {
     const nextRank = ranks.filter(r=>r.MinRating<=nextRating && r.MaxRating >= nextRating)[0];
 
     const nextPercent = Math.round( ( (nextRating-nextRank.MinRating) / (nextRank.MaxRating-nextRank.MinRating) * 100));
-      
+
     return {
       nextRank: nextRank,
       nextPercent: nextPercent,
