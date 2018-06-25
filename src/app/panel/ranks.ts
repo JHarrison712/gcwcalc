@@ -13,12 +13,12 @@ export interface Rank {
 export const DecayEstimates = {
   displayOrder:['title','value'],
   values:[
-    {rank:7, value:6000},
+    {rank:7, value:6001},
     {rank:8, value:6500},
-    {rank:9, value:7200},
+    {rank:9, value:7202},
     {rank:10, value:8150},
-    {rank:11, value:9600},
-    {rank:12, value:12000},
+    {rank:11, value:9598},
+    {rank:12, value:12002},
   ]
 }
 export const RankDisplay=['rank','imperialTitle', 'minRating','maxRating','ratingEarningCap','maxRatingDecay']

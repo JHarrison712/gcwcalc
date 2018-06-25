@@ -6,11 +6,11 @@
     <h2>How GCW Rank is calculated</h2>
 
     <p>
-      First of all, each player has a hidden value called 'GCW Rating'. This rating value determines your current rank as well
-      as the percent progress that you see in-game.
+      Each player has a hidden attribute called 'GCW Rating.' This rating puts you into a rank range defined in the following table.
+      Each week your rating is recalculated based on your accumulated GCW Points and your current rank's decay values.
     </p>
 
-    <p>There is a table that creates twelve ranks with each rank covering 5000 rating points, as well as rating decay and maximum gains per week.</p>
+    <p>Here is the Rank table</p>
 
     <table mat-table [dataSource]="ranks" class="mat-elevation-z8">
       <ng-container matColumnDef="rank">
@@ -48,11 +48,93 @@
     </table>
 
     <h3>The Equations</h3>
-    <p><code>CurrentRating = MinRating + (Rank_Progress / 100) * (MaxRating - MinRating)</code></p>
-    <p>You also need your "Rating Change". This is based on the GCW Points you accumulated this week</p>
-    <p><code>RatingChange = Ceiling( (RatingEarningCap * GCW_Points ) / (RatingEarningCap + GCW_Points)) - MaxRatingDecay</code></p>
-    <p><code>NextRating = CurrentRating + RatingChange</code>  *There are some edge cases here. For instance you cannot exceed 59999 rating, and if you decay below Lieutenant it will only decay to 29999 rating</p>
-    <p>With your new rating value, find the Rank band that you fit in.</p>
-    <p>To get your new progress percent: <code>round( (NextRating-NextRankMinRating) / (NextRankMaxRating - NextRankMaxRating)  * 100 )</code></p>
+    <p>
+      We have to reverse engineer your GCW rating based on the progress percent you see in game.
+    </p>
+    <code>GCW Rating  = CurrentRankMinRating + (Rank_Progress / 100) * (CurrentRankMaxRating - CurrentRankMinRating)</code>
+
+    <p>This value gets passed into the source code logic that makes a GCW Rating adjustment. See the source logic below.</p>
+    <p>
+      Your RatingAdjustment is added to your current rating to get your next rating value. Using this value, we can find the new
+      rank that you fit into by using the Min and Max Rating values in the table.
+    </p>
+    <code>NextRating = CurrentRating + RatingChange</code>
+
+    <p>Finally, your next progress percent can be found by turning your rating into a percent completed in your rank range.</p>
+    <code>Next Percent = (NextRating-NewRankMinRating) / (NewRankMaxRating - NewRankMaxRating) * 100</code>
+
+
+    <h3>Rank adjustment login from the source code</h3>
+    <pre>
+        <code>
+        int Pvp::calculateRatingAdjustment(int const gcwPoints, int const currentRating, int &amp;totalEarnedRating, int &amp;totalEarnedRatingAfterDecay, int &amp;cappedRatingAdjustment)
+        &#123;
+          totalEarnedRating = 0;
+          totalEarnedRatingAfterDecay = 0;
+          cappedRatingAdjustment = 0;
+
+          // get current rank
+          Pvp::PvpRankInfo const &amp; rankInfo = getRankInfo(currentRating);
+          if (rankInfo.rank &lt;= 0)
+            return 0;
+
+          // nothing to do if no points to convert and current rank doesn't decay
+          if ((gcwPoints &lt;= 0) &amp;&amp; (rankInfo.ratingDecayBalance &lt;= 0))
+            return 0;
+
+          // convert points to rating
+          if (gcwPoints > 0)
+          &#123;
+            // round any fractional rating up so that no hard earned GCW points are "lost"
+            int64 numerator = static_cast&lt;int64&gt;(gcwPoints) * static_cast&lt;int64&gt;(rankInfo.ratingEarningCap);
+            int64 denominator = static_cast&lt;int64&gt;(gcwPoints) + static_cast&lt;int64&gt;(rankInfo.ratingEarningCap);
+            totalEarnedRating = static_cast&lt;int&gt;(numerator / denominator);
+            if (numerator % denominator)
+              ++totalEarnedRating;
+
+            // if the rank is a decayable rank, and the GCW points is more than
+            // what is required to offset rank decay, use a different formula
+            // to calculate the additional rank progress
+            if ((rankInfo.ratingDecayBalance > 0) &amp;&amp; (totalEarnedRating >= rankInfo.ratingDecayBalance) &amp;&amp; (rankInfo.pointToOffsetDecay > 0) &amp;&amp; (gcwPoints > rankInfo.pointToOffsetDecay))
+            &#123;
+              numerator = static_cast&lt;int64&gt;(gcwPoints - rankInfo.pointToOffsetDecay) * static_cast&lt;int64&gt;(rankInfo.ratingEarningCap - rankInfo.ratingDecayBalance + 1000);
+              denominator = static_cast&lt;int64&gt;(gcwPoints - rankInfo.pointToOffsetDecay) + static_cast&lt;int64&gt;(rankInfo.ratingEarningCap - rankInfo.ratingDecayBalance + 1000);
+              totalEarnedRating = static_cast&lt;int&gt;(numerator / denominator);
+              if (numerator % denominator)
+                ++totalEarnedRating;
+
+              totalEarnedRating += rankInfo.ratingDecayBalance;
+            &#125;
+          &#125;
+          else
+          &#123;
+            totalEarnedRating = 0;
+          &#125;
+
+          // apply rating decay, if any
+          totalEarnedRatingAfterDecay = totalEarnedRating - rankInfo.ratingDecayBalance;
+
+          // if rating loss from decay, cap loss
+          cappedRatingAdjustment = std::max(-rankInfo.maxRatingDecay, totalEarnedRatingAfterDecay);
+
+          // if there's a decay floor, make sure the rating decay doesn't cause the rating to fall below the floor
+          int finalRatingAdjustment = cappedRatingAdjustment;
+          if ((rankInfo.ratingDecayFloor > 0) &amp;&amp; (finalRatingAdjustment &lt; 0) &amp;&amp; ((currentRating + finalRatingAdjustment) &lt; rankInfo.ratingDecayFloor))
+            finalRatingAdjustment = rankInfo.ratingDecayFloor - currentRating;
+
+          return finalRatingAdjustment;
+        &#125;
+      </code>
+
+    </pre> Calculating points to offset decay
+    <pre>
+    <code>
+        static_cast&lt;int&gt;(
+            ( static_cast&lt;int64&gt;(ratingEarningCap) * static_cast&lt;int64&gt;(ratingDecayBalance - 1) )
+            /
+            static_cast&lt;int64&gt;(  ratingEarningCap - ratingDecayBalance + 1 )
+          ) + 1;
+    </code>
+    </pre>
   </div>
 </div>
