@@ -8,7 +8,7 @@
   /* border-radius: 1em; */
   padding: 1em;
   margin: auto;
-  
+
 }
 .calc{
   height:350px;
@@ -18,10 +18,10 @@
 .calc button{
   position: absolute;
   bottom: 1em;
-  left: 0; 
-  right: 0; 
-  margin-left: auto; 
-  margin-right: auto; 
+  left: 0;
+  right: 0;
+  margin-left: auto;
+  margin-right: auto;
   width:150px;
 }
 
@@ -30,6 +30,12 @@
   margin:auto;
 }
 
+
+.flexcenter{
+  display: flex;
+  align-items: center;
+  justify-content: center
+}
 
 
 

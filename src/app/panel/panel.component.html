@@ -6,16 +6,16 @@
   <a [routerLink]="['how-it-works']">How it's calculated</a>
 </div>
 <div class="flex">
-  <div class="panel calc" 
-  *ngIf="!prediction" 
-    [ngClass]="{'impLogo':faction===0, 'rebLogo':faction===1}">
+  <div class="panel calc" *ngIf="!prediction" [ngClass]="{'impLogo':faction===0, 'rebLogo':faction===1}">
     <h2>GCW Progress Calculator</h2>
     <form [formGroup]="myForm" (ngSubmit)="onSubmit(myForm)">
       <div>
         <mat-form-field class="inputWidth">
           <mat-select formControlName="rank" placeholder="Current Rank">
             <mat-option *ngFor="let rank of ranks" [value]="rank">
-              <span>{{getRankName(rank)}}</span>
+              <div [ngClass]="{'imperial':faction===0,'rebel':faction===1}">
+                <span>{{getRankName(rank)}}</span>
+              </div>
             </mat-option>
           </mat-select>
         </mat-form-field>
@@ -24,14 +24,11 @@
 
       <div>
         <mat-form-field class="inputWidth">
-          <input matInput formControlName="percent" type="number" #percent  placeholder="Current progress to next rank">
-              <mat-progress-bar
-          class="inputWidth" style="margin:auto"
-          [color]="'primary'"
-          [mode]="'determinate'"
-          [value]="percent.value">          
-      </mat-progress-bar></mat-form-field>
-  
+          <input matInput formControlName="percent" type="number" #percent placeholder="Current progress to next rank">
+          <mat-progress-bar class="inputWidth" style="margin:auto" [color]="'primary'" [mode]="'determinate'" [value]="percent.value">
+          </mat-progress-bar>
+        </mat-form-field>
+
       </div>
 
       <div>
@@ -45,23 +42,16 @@
     </form>
   </div>
 
-  <div class="panel calc" *ngIf="prediction">
+  <div class="panel calc" *ngIf="prediction"  [ngClass]="{'impLogo':faction===0, 'rebLogo':faction===1}">
 
     <h2>After the update, you will be...</h2>
-    <div>
-      <h2>
-        <span [ngClass]="{'imperial':faction===0,'rebel':faction===1}">
-          {{getRankName(prediction.nextRank)}}
-        </span>
-        </h2>
+    <div class="flexcenter" [ngClass]="{'imperial':faction===0,'rebel':faction===1}">
+      <div class="rank {{'rank'+prediction.nextRank.Rank}}"></div>
+      <h2 class="newRank"> {{getRankName(prediction.nextRank)}} </h2>
     </div>
     <div>
       <h2>{{prediction.nextPercent}}% to next rank</h2>
-      <mat-progress-bar
-          class="example-margin"
-          [color]="'primary'"
-          [mode]="'determinate'"
-          [value]="prediction.nextPercent">          
+      <mat-progress-bar class="example-margin" [color]="'primary'" [mode]="'determinate'" [value]="prediction.nextPercent">
       </mat-progress-bar>
     </div>
     <button mat-raised-button color="warn" type="submit" (click)="prediction=null">Reset</button>

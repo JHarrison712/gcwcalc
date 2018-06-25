@@ -1,0 +1,144 @@
+/* You can add global styles to this file, and also import other style files */
+@import "~@angular/material/prebuilt-themes/deeppurple-amber.css";
+
+.help{
+  position: absolute;
+  top:0.5em;
+  right:0.5em;
+}
+
+.newRank{
+  text-shadow: 2px 2px 5px white;
+  font-size: 3em;
+}
+
+.flex {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-content: center;
+}
+
+.impLogo {
+  background-image: url("assets/imperial.png");
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  /* opacity: 0.5; */
+}
+.rebLogo {
+  background-image: url("assets/rebel.png");
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  /* opacity: 0.5; */
+}
+
+
+
+table {
+  width: 100%;
+}
+
+span.footer{
+	position: fixed;
+	right:.5em;
+	bottom: .5em
+}
+
+$rank_icon_size: 64px;
+
+$row0:0px;
+$row1:-66px;
+$row2:-132px;
+$row3:-197px;
+$col0:0px;
+$col1:-65px;
+$col2:-130px;
+$col3:-195px;
+$col4:-260px;
+$col5:-326px;
+
+.mat-select-panel .mat-optgroup-label, .mat-select-panel .mat-option {
+  height: 4em;
+}
+
+.rank{
+  width: $rank_icon_size;
+  height: $rank_icon_size;
+  background: url("assets/ui_gcw_rank_icons.png");
+  background-repeat: no-repeat;
+  display: inline-block;
+}
+
+.imperial .rank1 {
+  background-position:  $col5 $row3;
+}
+.imperial .rank2 {
+  background-position:  $col4 $row3;
+}
+.imperial .rank3 {
+  background-position:  $col3 $row3;
+}
+.imperial .rank4 {
+  background-position:  $col2 $row3;
+}
+.imperial .rank5 {
+  background-position:  $col1 $row3;
+}
+.imperial .rank6 {
+  background-position:  $col0 $row3;
+}
+.imperial .rank7 {
+  background-position:   $col0 $row0;
+}
+.imperial .rank8 {
+  background-position:   $col1 $row0;
+}
+.imperial .rank9 {
+  background-position:  $col2 $row0;
+}
+.imperial .rank10 {
+  background-position:   $col3 $row0;
+}
+.imperial .rank11 {
+  background-position:   $col4 $row0;
+}
+.imperial .rank12 {
+  background-position:   $col5 $row0;
+}
+
+.rebel .rank1 {
+  background-position:  $col5 $row2;
+}
+.rebel .rank2 {
+  background-position:  $col4 $row2;
+}
+.rebel .rank3 {
+  background-position:  $col3 $row2;
+}
+.rebel .rank4 {
+  background-position:  $col2 $row2;
+}
+.rebel .rank5 {
+  background-position:  $col1 $row2;
+}
+.rebel .rank6 {
+  background-position:  $col0 $row2;
+}
+.rebel .rank7 {
+  background-position:  $col5 $row1;
+}
+.rebel .rank8 {
+  background-position:  $col4 $row1;
+}
+.rebel .rank9 {
+  background-position:  $col3 $row1;
+}
+.rebel .rank10 {
+  background-position:  $col2 $row1;
+}
+.rebel .rank11 {
+  background-position:  $col1 $row1;
+}
+.rebel .rank12 {
+  background-position:  $col0 $row1;
+}
